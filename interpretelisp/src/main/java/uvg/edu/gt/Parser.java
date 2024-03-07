@@ -64,7 +64,7 @@ public class Parser {
         try {
             return Integer.parseInt(token);
         } catch (NumberFormatException e) {
-            return token; // Trata el token como un símbolo si no es un número
+            return token; 
         }
     }
 }
