@@ -73,6 +73,25 @@ public class ExpressionEvaluator {
         }
         return quotient;
     }
+    // COND
+    else if ("COND".equals(operator)) {
+        return evaluateCond(args);
+    }
+    
     throw new Exception("Operador desconocido: " + operator);
+    }
+
+    private Object evaluateCond(List<?> clauses) throws Exception {
+        for (Object clause : clauses) {
+            if (!(clause instanceof List) || ((List<?>) clause).size() != 2) {
+                throw new Exception("Clausula COND inválida: " + clause.toString());
+            }
+            List<?> pair = (List<?>) clause;
+            Object conditionResult = evaluate(pair.get(0));
+            if (Boolean.TRUE.equals(conditionResult)) {
+                return evaluate(pair.get(1));
+            }
+        }
+        return null; 
     }
 }
