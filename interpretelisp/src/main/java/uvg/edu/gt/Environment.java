@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 public class Environment {
     private final Map<String, Object> variables;
-    private final Map<String, Function> functions;
+    private final Map<String, LispFunction> functions;
 
     public Environment() {
         this.variables = new HashMap<>();
@@ -21,11 +21,11 @@ public class Environment {
         return variables.get(name);
     }
 
-    public void defineFunction(String name, Function function) {
+    public void defineFunction(String name, LispFunction function) {
         functions.put(name, function);
     }
 
-    public Function lookupFunction(String name) {
+    public LispFunction lookupFunction(String name) {
         return functions.get(name);
     }
 }
