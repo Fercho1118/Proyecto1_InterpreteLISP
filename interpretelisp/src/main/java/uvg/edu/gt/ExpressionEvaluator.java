@@ -13,11 +13,11 @@ public class ExpressionEvaluator {
         if (expr instanceof List) {
             return evaluateList((List<?>) expr);
         } else if (expr instanceof String) {
-            // Aquí iría la lógica para manejar variables y símbolos
             return environment.lookupVariable((String) expr);
-        } else {
-            // Números y otros literales se evalúan a sí mismos
+        } else if (expr instanceof Integer) {
             return expr;
+        } else { 
+            throw new Exception("Tipo de expresión no manejado: " + expr.getClass().getName());
         }
     }
 

@@ -13,6 +13,11 @@ public class Environment {
         this.functions = new HashMap<>();
     }
 
+    public Environment(Environment other) {
+        this.variables = new HashMap<>(other.variables);
+        this.functions = new HashMap<>(other.functions);
+    }
+
     public void defineVariable(String name, Object value) {
         variables.put(name, value);
     }

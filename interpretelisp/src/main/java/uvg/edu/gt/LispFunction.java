@@ -11,8 +11,15 @@ public class LispFunction {
         this.body = body;
     }
 
-    public Object apply(List<Object> arguments, Environment environment) {
-        //Falta lógica
-        return null;
+    public Object apply(List<Object> arguments, Environment environment) throws Exception {
+        Environment functionEnv = new Environment(environment); // Crear un nuevo entorno basado en el global
+        if (parameters.size() != arguments.size()) {
+            throw new Exception("Número incorrecto de argumentos.");
+        }
+        for (int i = 0; i < parameters.size(); i++) {
+            functionEnv.defineVariable(parameters.get(i), arguments.get(i)); // Mapear parámetros a argumentos
+        }
+        
+        return null; 
     }
 }
