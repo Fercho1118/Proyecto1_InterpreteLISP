@@ -77,7 +77,18 @@ public class ExpressionEvaluator {
     else if ("COND".equals(operator)) {
         return evaluateCond(args);
     }
-    
+    // QUOTE
+    else if ("QUOTE".equals(operator) || "'".equals(operator) && args.size() == 1) {
+        return args.get(0);
+    }
+    //SETQ
+    else if ("SETQ".equals(operator) && args.size() == 2 && args.get(0) instanceof String) {
+        String varName = (String) args.get(0);
+        Object value = evaluate(args.get(1));
+        environment.defineVariable(varName, value);
+        return value;
+    }
+
     throw new Exception("Operador desconocido: " + operator);
     }
 
