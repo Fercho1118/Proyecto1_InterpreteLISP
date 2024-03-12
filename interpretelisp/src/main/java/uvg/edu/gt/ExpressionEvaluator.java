@@ -132,6 +132,17 @@ public class ExpressionEvaluator {
         int secondArg = (Integer) evaluate(args.get(1));
         return firstArg > secondArg;
     }
+    else if ("DEFUN".equals(operator)) {
+        if (list.size() != 4 || !(list.get(1) instanceof String) || !(list.get(2) instanceof List) || !(list.get(3) instanceof List)) {
+            throw new Exception("Formato incorrecto para DEFUN");
+        }
+        String functionName = (String) list.get(1);
+        List<String> parameters = (List<String>) list.get(2);
+        Object body = list.get(3);
+        LispFunction function = new LispFunction(parameters, body);
+        environment.defineFunction(functionName, function);
+        return "Function " + functionName + " defined"; // O algún otro valor indicativo de éxito
+    } 
 
     throw new Exception("Operador desconocido: " + operator);
     }
