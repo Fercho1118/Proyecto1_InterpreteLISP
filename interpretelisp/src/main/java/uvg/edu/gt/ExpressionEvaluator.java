@@ -1,5 +1,6 @@
 package uvg.edu.gt;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExpressionEvaluator {
@@ -87,6 +88,49 @@ public class ExpressionEvaluator {
         Object value = evaluate(args.get(1));
         environment.defineVariable(varName, value);
         return value;
+    }
+    else if ("ATOM".equals(operator)) {
+    if (args.size() != 1) {
+        throw new Exception("ATOM espera exactamente un argumento");
+    }
+    Object arg = evaluate(args.get(0));
+    return !(arg instanceof List);
+}
+    // LIST
+    else if ("LIST".equals(operator)) {
+        if (args.isEmpty()) {
+            throw new Exception("LIST espera al menos un argumento");
+        }
+        List<Object> result = new ArrayList<>();
+        for (Object arg : args) {
+            result.add(evaluate(arg));
+        }
+        return result;
+    }
+    //Equal
+    else if ("EQUAL".equals(operator)) {
+        if (args.size() != 2) {
+            throw new Exception("EQUAL espera exactamente dos argumentos");
+        }
+        Object firstArg = evaluate(args.get(0));
+        Object secondArg = evaluate(args.get(1));
+        return firstArg.equals(secondArg);
+    }
+    else if ("<".equals(operator)) {
+        if (args.size() != 2) {
+            throw new Exception("< espera exactamente dos argumentos");
+        }
+        int firstArg = (Integer) evaluate(args.get(0));
+        int secondArg = (Integer) evaluate(args.get(1));
+        return firstArg < secondArg;
+    }
+    else if (">".equals(operator)) {
+        if (args.size() != 2) {
+            throw new Exception("> espera exactamente dos argumentos");
+        }
+        int firstArg = (Integer) evaluate(args.get(0));
+        int secondArg = (Integer) evaluate(args.get(1));
+        return firstArg > secondArg;
     }
 
     throw new Exception("Operador desconocido: " + operator);
