@@ -1,0 +1,8 @@
+(SETQ x 10)
+(SETQ y 20)
+(+ x y)
+(DEFUN square (n) (* n n))
+(square 5)
+(DEFUN sum (a b) (+ a b))
+(sum x y)
+(COND ((> x y) x) ((< x y) y) (T 0))
