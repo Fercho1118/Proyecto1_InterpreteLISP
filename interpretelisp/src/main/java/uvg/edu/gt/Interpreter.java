@@ -16,7 +16,19 @@ public class Interpreter {
         System.out.println("Resultado: " + result);
     }
 
+    public void interpretFile(String filePath) throws Exception {
+        List<String> lines = FileUtils.readLines(filePath);
+        for (String line : lines) {
+            interpret(line);
+        }
+    }
+
     public static void main(String[] args) throws Exception {
-        new Interpreter().interpret("(+ 1 2 3)");
+        if (args.length > 0) {
+            String filePath = args[0];
+            new Interpreter().interpretFile(filePath);
+        } else {
+            System.out.println("Por favor, proporcione el camino del archivo como argumento.");
+        }
     }
 }
