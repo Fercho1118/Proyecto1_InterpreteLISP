@@ -24,11 +24,7 @@ public class Interpreter {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length > 0) {
-            String filePath = args[0];
-            new Interpreter().interpretFile(filePath);
-        } else {
-            System.out.println("Por favor, proporcione el camino del archivo como argumento.");
-        }
+        String filePath = "C:\\Users\\ferna\\OneDrive\\UVG\\Tercer Semestre\\Algoritmos y Estructura de Datos\\Proy 1\\Proyecto1_InterpreteLISP\\interpretelisp\\testLispExpressions.txt";
+        new Interpreter().interpretFile(filePath);
     }
 }
