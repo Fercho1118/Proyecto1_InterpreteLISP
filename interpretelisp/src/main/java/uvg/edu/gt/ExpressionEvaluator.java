@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class ExpressionEvaluator {
     private Environment environment;
+    private DefunHandler defunHandler;
 
 
     /**
@@ -19,6 +20,7 @@ public class ExpressionEvaluator {
      */
     public ExpressionEvaluator(Environment environment) {
         this.environment = environment;
+        this.defunHandler = new DefunHandler(environment);
     }
 
 
@@ -72,6 +74,21 @@ public class ExpressionEvaluator {
             } else {
                 args.add(arg);
             }
+        }
+
+        if ("DEFUN".equals(list.get(0))) {
+            String functionName = (String) list.get(1);
+            List<String> parameters = (List<String>) list.get(2);
+            Object body = list.get(3);
+            defunHandler.defineFunction(functionName, parameters, body);
+            return null; // O cualquier valor apropiado
+        }
+    
+        // Ejemplo de manejo de llamada a función
+        if (environment.lookupFunction(list.get(0).toString()) != null) {
+            String functionName = list.get(0).toString();
+            List<Object> arguments = new ArrayList<>(list.subList(1, list.size()));
+            return defunHandler.applyFunction(functionName, arguments);
         }
     
         // Dentro de la estructura switch en el método evaluateList
