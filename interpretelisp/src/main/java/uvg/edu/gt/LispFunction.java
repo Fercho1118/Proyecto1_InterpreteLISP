@@ -29,15 +29,13 @@ public class LispFunction {
      * @return El resultado de evaluar el cuerpo de la función con los argumentos proporcionados.
      * @throws Exception Si el número de argumentos no coincide con el número de parámetros o si ocurre un error durante la evaluación del cuerpo de la función.
      */
-    public Object apply(List<Object> arguments, Environment environment) throws Exception {
-        Environment functionEnv = new Environment(environment); // Corregido para heredar el entorno actual
-        if (parameters.size() != arguments.size()) {
-            throw new Exception("Número incorrecto de argumentos.");
+        public Object apply(List<Object> arguments, Environment globalEnvironment) throws Exception {
+            Environment localEnvironment = new Environment(globalEnvironment);
+            for (int i = 0; i < parameters.size(); i++) {
+                localEnvironment.defineVariable(parameters.get(i), arguments.get(i));
+            }
+            return new ExpressionEvaluator(localEnvironment).evaluate(body);
         }
-        for (int i = 0; i < parameters.size(); i++) {
-            functionEnv.defineVariable(parameters.get(i), arguments.get(i));
-        }
-        
-        return new ExpressionEvaluator(functionEnv).evaluate(body);
-    }
-}
+    } 
+    
+    

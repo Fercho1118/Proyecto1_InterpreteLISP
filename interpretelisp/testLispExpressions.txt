@@ -1,7 +1,38 @@
-(+ (+ 1 1) 2)
-(+ (* 2 x) y)
-(DEFUN square (n) (* n n))
-(square 5)
-(DEFUN sum (a b) (+ a b))
-(sum x y)
-(COND ((> x y) x) ((< x y) y) (T 0))
+; Suma
+(+ 1 2 3)
+
+; Resta
+(- 10 2 3)
+
+; Multiplicación
+(* 2 3 4)
+
+; División
+(/ 20 2 2)
+
+; Definición de una variable y asignación de valor
+(SETQ x 10)
+
+; Uso de una variable
+(+ x 5)
+
+; Definición de una función que suma dos números
+(DEFUN sumar (a b) (+ a b))
+
+; Uso de una función definida por el usuario
+(sumar 3 7)
+
+; Uso de COND (condicional)
+(COND
+    ((> 3 2) 'mayor)
+    ((< 3 2) 'menor)
+)
+
+; Uso de QUOTE
+(QUOTE (1 2 3))
+
+; Creación de una lista
+(LIST 1 2 3 4)
+
+; Comprobación de igualdad
+(EQUAL 1 1)

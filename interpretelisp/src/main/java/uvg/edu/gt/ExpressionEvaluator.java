@@ -60,142 +60,114 @@ public class ExpressionEvaluator {
             throw new Exception("El primer elemento de la lista debe ser un operador en forma de String");
         }
         String operator = list.get(0).toString();
-        List<?> args = list.subList(1, list.size());
-
-        // Suma
-    if ("+".equals(operator)) {
-        int sum = 0;
-        for (Object arg : args) {
+        List<?> originalArgs = list.subList(1, list.size());
+        List<Object> args = new ArrayList<>();
+    
+        // Preprocesa los argumentos para manejar strings como expresiones
+        for (Object arg : originalArgs) {
             if (arg instanceof String){
                 System.out.println("Evaluando un string ... !!!");
                 Object parsedExpr = Parser.parse((String) arg);
-                // Object result = evaluate(parsedExpr);
-                // System.out.println("Resultado: " + result);
-                arg = parsedExpr;              
+                args.add(evaluate(parsedExpr));              
+            } else {
+                args.add(arg);
             }
-            sum += (Integer) evaluate(arg);
         }
-        return sum;
-    }
-    // Resta
-    else if ("-".equals(operator)) {
-        if (args.isEmpty()) {
-            throw new Exception("La operación resta requiere al menos un argumento");
-        }
-        int result = (Integer) evaluate(args.get(0));
-        for (int i = 1; i < args.size(); i++) {
-            result -= (Integer) evaluate(args.get(i));
-        }
-        return result;
-    }
-    // Multiplicación
-    else if ("*".equals(operator)) {
-        int product = 1;
-        for (Object arg : args) {
-            product *= (Integer) evaluate(arg);
-        }
-        return product;
-    }
-    // División
-    else if ("/".equals(operator)) {
-        if (args.isEmpty()) {
-            throw new Exception("La operación división requiere al menos un argumento");
-        }
-        int quotient = (Integer) evaluate(args.get(0));
-        for (int i = 1; i < args.size(); i++) {
-            int divisor = (Integer) evaluate(args.get(i));
-            if (divisor == 0) {
-                throw new Exception("División por cero");
-            }
-            quotient /= divisor;
-        }
-        return quotient;
-    }
-    // COND
-    else if ("COND".equals(operator)) {
-        return evaluateCond(args);
-    }
-    // QUOTE
-    else if ("QUOTE".equals(operator) || "'".equals(operator) && args.size() == 1) {
-        return args.get(0);
-    }
-    //SETQ
-    else if ("SETQ".equals(operator) && args.size() == 2 && args.get(0) instanceof String) {
-        String varName = (String) args.get(0);
-        Object value = evaluate(args.get(1));
-        environment.defineVariable(varName, value);
-        return value;
-    }
-    else if ("ATOM".equals(operator)) {
-    if (args.size() != 1) {
-        throw new Exception("ATOM espera exactamente un argumento");
-    }
-    Object arg = evaluate(args.get(0));
-    return !(arg instanceof List);
-}
-    // LIST
-    else if ("LIST".equals(operator)) {
-        if (args.isEmpty()) {
-            throw new Exception("LIST espera al menos un argumento");
-        }
-        List<Object> result = new ArrayList<>();
-        for (Object arg : args) {
-            result.add(evaluate(arg));
-        }
-        return result;
-    }
-    //Equal
-    else if ("EQUAL".equals(operator)) {
-        if (args.size() != 2) {
-            throw new Exception("EQUAL espera exactamente dos argumentos");
-        }
-        Object firstArg = evaluate(args.get(0));
-        Object secondArg = evaluate(args.get(1));
-        return firstArg.equals(secondArg);
-    }
-    else if ("<".equals(operator)) {
-        if (args.size() != 2) {
-            throw new Exception("< espera exactamente dos argumentos");
-        }
-        int firstArg = (Integer) evaluate(args.get(0));
-        int secondArg = (Integer) evaluate(args.get(1));
-        return firstArg < secondArg;
-    }
-    else if (">".equals(operator)) {
-        if (args.size() != 2) {
-            throw new Exception("> espera exactamente dos argumentos");
-        }
-        int firstArg = (Integer) evaluate(args.get(0));
-        int secondArg = (Integer) evaluate(args.get(1));
-        return firstArg > secondArg;
-    }
-    //DEFUN
-    else if ("DEFUN".equals(operator)) {
-        if (list.size() != 4 || !(list.get(1) instanceof String) || !(list.get(2) instanceof List)) {
-            throw new Exception("Formato incorrecto para DEFUN");
-        }
-        String functionName = (String) list.get(1);
-        List<?> parametersRaw = (List<?>) list.get(2);
-        List<String> parameters = new ArrayList<>();
-        for (Object param : parametersRaw) {
-            if (!(param instanceof String)) {
-                throw new Exception("Los parámetros de la función deben ser cadenas.");
-            }
-            parameters.add((String) param);
-        }
-        Object body = list.get(3);
     
-        System.out.println("Definiendo función: " + functionName);
-        System.out.println("Parámetros: " + parameters);
-        System.out.println("Cuerpo: " + body);
+        // Dentro de la estructura switch en el método evaluateList
+        switch (operator) {
+            case "+":{
+                int sum = 0;
+                for (Object arg : args) {
+                    sum += (Integer) evaluate(arg);
+                }
+                return sum;
+            }
+            case "-":{
+                if (args.isEmpty()) {
+                    throw new Exception("La operación resta requiere al menos un argumento");
+                }
+                int result = (Integer) evaluate(args.get(0));
+                for (int i = 1; i < args.size(); i++) {
+                    result -= (Integer) evaluate(args.get(i));
+                }
+                return result;
+            }
+            case "*":{
+                int product = 1;
+                for (Object arg : args) {
+                    product *= (Integer) evaluate(arg);
+                }
+                return product;
+            }
+            case "/":{
+                if (args.isEmpty()) {
+                    throw new Exception("La operación división requiere al menos un argumento");
+                }
+                int quotient = (Integer) evaluate(args.get(0));
+                for (int i = 1; i < args.size(); i++) {
+                    int divisor = (Integer) evaluate(args.get(i));
+                    if (divisor == 0) {
+                        throw new Exception("División por cero");
+                    }
+                    quotient /= divisor;
+                }
+                return quotient;
+            }
+            case "COND":{
+                return evaluateCond(args); // Asume que evaluateCond ya maneja la evaluación correctamente.
+            }
+            case "QUOTE":
+            case "'":{
+                if (args.size() == 1) {
+                    return args.get(0);
+                } else {
+                    throw new Exception("QUOTE espera exactamente un argumento");
+                }
+            }
+            case "LIST":{
+                return args; // Los argumentos ya fueron evaluados previamente.
+            }
+            case "EQUAL": {
+                if (args.size() != 2) {
+                    throw new Exception("EQUAL espera exactamente dos argumentos");
+                }
+                Object firstArg = evaluate(args.get(0));
+                Object secondArg = evaluate(args.get(1));
+                return firstArg.equals(secondArg);
+            }
+        }
     
-        LispFunction function = new LispFunction(parameters, body);
-        environment.defineFunction(functionName, function);
-        return "Function " + functionName + " defined";
+        LispFunction userFunction = environment.lookupFunction(operator);
+        if (userFunction != null) {
+            List<Object> evaluatedArgs = new ArrayList<>();
+            for (Object arg : originalArgs) {
+                evaluatedArgs.add(evaluate(arg));
+            }
+            return userFunction.apply(evaluatedArgs, environment);
+        }
+    
+        if ("SETQ".equals(operator)) {
+            if (originalArgs.size() != 2) {
+                throw new Exception("SETQ espera exactamente dos argumentos.");
+            }
+            
+            if (!(originalArgs.get(0) instanceof String)) {
+                throw new Exception("El primer argumento de SETQ debe ser una cadena que represente el nombre de la variable.");
+            }
+            String variableName = (String) originalArgs.get(0);
+            
+            Object value = evaluate(originalArgs.get(1));
+            
+            environment.defineVariable(variableName, value);
+        
+            return value;
+        }
+    
+        throw new Exception("Operador o función desconocido/a: " + operator);
+    
     }
     
-    throw new Exception("Operador desconocido: " + operator);
-    }
 
     /**
      * Evalúa las cláusulas de una construcción COND, retornando el resultado de la primera cláusula verdadera.
@@ -215,7 +187,7 @@ public class ExpressionEvaluator {
                 return evaluate(pair.get(1));
             }
         }
-        return "NIL"; // Cambio aquí
+        return "NIL";
     }
     
 }
