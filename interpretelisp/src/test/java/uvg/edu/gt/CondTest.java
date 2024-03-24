@@ -3,23 +3,34 @@ package uvg.edu.gt;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-class InterpreterTest {
+class CondTest {
 
     @Test
-    void testCondTrueCondition() throws Exception {
-        Interpreter interpreter = new Interpreter();
-        interpreter.interpret("(COND ((> 3 2) 'mayor))");
+    void testGreaterThanOperator() throws Exception {
+        String expression = "(> 3 2)";
+        Object result = Parser.parse(expression);
+        assertTrue((Boolean) result);
     }
 
     @Test
-    void testCondFalseCondition() throws Exception {
-        Interpreter interpreter = new Interpreter();
-        interpreter.interpret("(COND ((< 3 2) 'menor) (T 'otro))");
+    void testLessThanOperator() throws Exception {
+        String expression = "(< 2 3)";
+        Object result = Parser.parse(expression);
+        assertTrue((Boolean) result);
     }
 
     @Test
-    void testCondNoTrueCondition() throws Exception {
-        Interpreter interpreter = new Interpreter();
-        interpreter.interpret("(COND ((< 3 3) 'menor))");
+    void testCondEvaluation() throws Exception {
+        String expression = "(COND ((> 3 2) 'true) ((< 3 2) 'false))";
+        Object result = Parser.parse(expression);
+        assertEquals("true", result);
+    }
+
+    @Test
+    void testCondDefaultCase() throws Exception {
+        String expression = "(COND ((> 2 3) 'false) (T 'true))";
+        Object result = Parser.parse(expression);
+        assertEquals("true", result);
     }
 }
+

@@ -117,11 +117,6 @@ public class ExpressionEvaluator {
                 }
                 return quotient;
             }
-            case "COND": {
-                CondHandler condHandler = new CondHandler(environment);
-                List<Object> formattedArgs = formatCondArgs(list.subList(1, list.size()));
-                return condHandler.evaluateCond(formattedArgs);
-            }
             case "QUOTE":
             case "'": { 
                 if (args.size() == 1) {
@@ -143,9 +138,9 @@ public class ExpressionEvaluator {
             }
             case "DEFUN": {
                 String functionName = (String) list.get(1);
-                List<?> paramsList = (List<?>) list.get(2);  // La lista de parámetros.
-                Object functionBody = list.get(3);  // El cuerpo de la función.
-    
+                List<?> paramsList = (List<?>) list.get(2); // La lista de parámetros.
+                Object functionBody = list.get(3); // El cuerpo de la función.
+
                 // Verificar que paramsList contiene solo Strings.
                 for (Object param : paramsList) {
                     if (!(param instanceof String)) {
@@ -154,11 +149,48 @@ public class ExpressionEvaluator {
                 }
                 @SuppressWarnings("unchecked")
                 List<String> params = (List<String>) paramsList;
-    
+
                 // Guarda la definición de la función sin intentar evaluar los parámetros o el cuerpo.
                 defunHandler.defineFunction(functionName, params, functionBody);
-    
+
                 return "Function " + functionName + " defined";
+            }
+            case ">": {
+                if (args.size() != 2) {
+                    throw new Exception("El operador > requiere exactamente dos argumentos.");
+                }
+                int left = (Integer) evaluate(args.get(0));
+                int right = (Integer) evaluate(args.get(1));
+                return left > right;
+            }
+            case "<": {
+                if (args.size() != 2) {
+                    throw new Exception("El operador < requiere exactamente dos argumentos.");
+                }
+                int left = (Integer) evaluate(args.get(0));
+                int right = (Integer) evaluate(args.get(1));
+                return left < right;
+            }
+            case ">=": {
+                if (args.size() != 2) {
+                    throw new Exception("El operador >= requiere exactamente dos argumentos.");
+                }
+                int left = (Integer) evaluate(args.get(0));
+                int right = (Integer) evaluate(args.get(1));
+                return left >= right;
+            }
+            case "<=": {
+                if (args.size() != 2) {
+                    throw new Exception("El operador <= requiere exactamente dos argumentos.");
+                }
+                int left = (Integer) evaluate(args.get(0));
+                int right = (Integer) evaluate(args.get(1));
+                return left <= right;
+            }
+            case "COND": {
+                CondHandler condHandler = new CondHandler(environment);
+                List<Object> formattedArgs = formatCondArgs(list.subList(1, list.size()));
+                return condHandler.evaluateCond(formattedArgs);
             }            
         }
     
