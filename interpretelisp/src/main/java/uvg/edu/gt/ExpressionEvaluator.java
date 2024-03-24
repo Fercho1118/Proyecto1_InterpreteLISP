@@ -117,13 +117,15 @@ public class ExpressionEvaluator {
                 }
                 return quotient;
             }
-            case "COND":{
-                return evaluateCond(args); // Asume que evaluateCond ya maneja la evaluación correctamente.
+            case "COND": {
+                CondHandler condHandler = new CondHandler(environment);
+                List<Object> formattedArgs = formatCondArgs(list.subList(1, list.size()));
+                return condHandler.evaluateCond(formattedArgs);
             }
             case "QUOTE":
-            case "'":{
+            case "'": { 
                 if (args.size() == 1) {
-                    return args.get(0);
+                    return args.get(0); 
                 } else {
                     throw new Exception("QUOTE espera exactamente un argumento");
                 }
@@ -200,19 +202,32 @@ public class ExpressionEvaluator {
      * @return El resultado de la primera cláusula verdadera, o null si ninguna cláusula es verdadera.
      * @throws Exception Si alguna de las cláusulas es inválida.
      */
-    private Object evaluateCond(List<?> clauses) throws Exception {
-        for (Object clause : clauses) {
-            if (!(clause instanceof List) || ((List<?>) clause).size() != 2) {
-                throw new Exception("Clausula COND inválida: " + clause.toString());
+    public Object evaluateCond(List<?> clauses) throws Exception {
+        for (Object clauseObj : clauses) {
+            if (!(clauseObj instanceof List)) {
+                throw new Exception("Formato de cláusula COND inválido: " + clauseObj.toString());
             }
-            List<?> pair = (List<?>) clause;
-            Object conditionResult = evaluate(pair.get(0));
-            if (Boolean.TRUE.equals(conditionResult)) {
-                return evaluate(pair.get(1));
+            List<?> clause = (List<?>) clauseObj;
+            if (clause.size() != 2) {
+                throw new Exception("Formato de cláusula COND inválido: " + clause.toString());
+            }
+            Object conditionResult = evaluate(clause.get(0)); // Evalúa la condición
+            if (conditionResult.equals(Boolean.TRUE)) { // Asume que `evaluate` devuelve un Boolean
+                return evaluate(clause.get(1)); // Evalúa y devuelve el resultado de la acción si la condición es verdadera
             }
         }
-        return "NIL";
+        return "NIL"; // Devuelve "NIL" si ninguna condición se cumple
     }
     
+    private List<Object> formatCondArgs(List<?> originalArgs) throws Exception {
+        List<Object> formattedArgs = new ArrayList<>();
+        for (Object arg : originalArgs) {
+            if (!(arg instanceof List) || ((List<?>) arg).size() != 2) {
+                throw new Exception("Cada cláusula de COND debe ser una lista con exactamente dos elementos.");
+            }
+            formattedArgs.add(arg);
+        }
+        return formattedArgs;
+    }
     
 }

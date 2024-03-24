@@ -23,10 +23,8 @@
 (suma 3 7)
 
 ; Uso de COND (condicional)
-(COND
-    ((> 3 2) 'mayor)
-    ((< 3 2) 'menor)
-)
+(COND ((> 3 2) 'mayor))
+(COND ((< 3 2) 'menor))
 
 ; Uso de QUOTE
 (QUOTE (1 2 3))
