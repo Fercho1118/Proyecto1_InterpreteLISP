@@ -2,6 +2,7 @@ package uvg.edu.gt;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -75,6 +76,7 @@ public class ExpressionEvaluator {
                 args.add(arg);
             }
         }
+        
         // Dentro de la estructura switch en el método evaluateList
         switch (operator) {
             case "+":{
@@ -136,6 +138,25 @@ public class ExpressionEvaluator {
                 Object firstArg = evaluate(args.get(0));
                 Object secondArg = evaluate(args.get(1));
                 return firstArg.equals(secondArg);
+            }
+            case "DEFUN": {
+                String functionName = (String) list.get(1);
+                List<?> paramsList = (List<?>) list.get(2);  // La lista de parámetros.
+                Object functionBody = list.get(3);  // El cuerpo de la función.
+    
+                // Verificar que paramsList contiene solo Strings.
+                for (Object param : paramsList) {
+                    if (!(param instanceof String)) {
+                        throw new Exception("Los parámetros de DEFUN deben ser strings.");
+                    }
+                }
+                @SuppressWarnings("unchecked")
+                List<String> params = (List<String>) paramsList;
+    
+                // Guarda la definición de la función sin intentar evaluar los parámetros o el cuerpo.
+                defunHandler.defineFunction(functionName, params, functionBody);
+    
+                return "Function " + functionName + " defined";
             }            
         }
     
@@ -165,28 +186,7 @@ public class ExpressionEvaluator {
 
             return value;
         }
-        
-        if ("DEFUN".equals(operator)) {
-            String functionName = (String) list.get(1);
-    
-            if (!(list.get(2) instanceof List)) {
-                throw new Exception("El segundo argumento de DEFUN debe ser una lista de parámetros.");
-            }
-            List<?> rawParameters = (List<?>) list.get(2);
-            List<String> parameters = new ArrayList<>();
-            for (Object param : rawParameters) {
-                if (!(param instanceof String)) {
-                    throw new Exception("Todos los parámetros deben ser cadenas.");
-                }
-                parameters.add((String) param);
-            }
-    
-            Object body = list.get(3);
-            defunHandler.defineFunction(functionName, parameters, body);
-    
-            // Retorna un mensaje de confirmación o null, según prefieras.
-            return "Función " + functionName + " definida correctamente.";
-        }
+
     
         throw new Exception("Operador o función desconocido/a: " + operator);
     
@@ -213,5 +213,6 @@ public class ExpressionEvaluator {
         }
         return "NIL";
     }
+    
     
 }

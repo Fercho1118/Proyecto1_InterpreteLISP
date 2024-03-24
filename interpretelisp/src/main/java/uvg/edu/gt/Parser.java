@@ -1,6 +1,7 @@
 package uvg.edu.gt;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
@@ -20,7 +21,10 @@ public class Parser {
      */
     public static Object parse(String expression) throws Exception {
         expression = expression.trim();
-        if (!isBalanced(expression)) {
+        if (expression.startsWith("(DEFUN")) {
+            return parseDefun(expression);
+        }
+        else if (!isBalanced(expression)) {
             throw new Exception("Unbalanced parentheses in expression: " + expression);
         }
         return parseExpression(expression);
@@ -59,7 +63,8 @@ public class Parser {
             int start = 1; // Skip initial '('
             for (int i = 1, depth = 0; i < expression.length(); i++) {
                 char ch = expression.charAt(i);
-                if (ch == '(') depth++;
+                if (ch == '(')
+                    depth++;
                 else if (ch == ')') {
                     if (depth == 0) {
                         String subExpr = expression.substring(start, i).trim();
@@ -84,7 +89,7 @@ public class Parser {
             return parseToken(expression);
         }
     }
-
+    
     /**
      * Convierte un token individual en un objeto. Intenta convertir el token en un entero; si falla, lo trata como una cadena.
      *
@@ -95,8 +100,74 @@ public class Parser {
         try {
             return Integer.parseInt(token);
         } catch (NumberFormatException e) {
-            return token; 
+            return token;
         }
     }
+    
+    /**
+     * Analiza una expresión DEFUN, extrayendo y procesando el nombre de la función,
+     * los parámetros y el cuerpo de la función.
+     * 
+     * @param expression La expresión DEFUN completa como una cadena de texto.
+     * @return Una representación de la definición de la función en forma de lista,
+     *         que incluye el identificador "DEFUN", el nombre de la función, la lista de parámetros,
+     *         y el cuerpo de la función.
+     * @throws Exception Si hay un error de sintaxis en los parámetros de DEFUN o si los paréntesis no están balanceados.
+     */
+    private static Object parseDefun(String expression) throws Exception {
+        // Elimina el prefijo "(DEFUN " y el sufijo ")", y luego realiza un trim.
+        String defunBody = expression.substring("(DEFUN ".length(), expression.length() - 1).trim();
+
+        // Encuentra el nombre de la función, asumiendo que está seguido por un espacio.
+        int endOfFunctionNameIndex = defunBody.indexOf(' ');
+        String functionName = defunBody.substring(0, endOfFunctionNameIndex).trim();
+
+        // El resto de la expresión después del nombre de la función es la combinación de parámetros y cuerpo.
+        String paramsAndBody = defunBody.substring(endOfFunctionNameIndex).trim();
+
+        // Encuentra el inicio y el fin de la lista de parámetros basado en paréntesis.
+        int startOfParamsIndex = paramsAndBody.indexOf('(');
+        int endOfParamsIndex = paramsAndBody.indexOf(')') + 1; // Incluye el paréntesis cerrado.
+        if (startOfParamsIndex == -1 || endOfParamsIndex == 0) {
+            throw new Exception("Syntax error in DEFUN parameters.");
+        }
+
+        // Extrae y procesa los parámetros.
+        String paramString = paramsAndBody.substring(startOfParamsIndex, endOfParamsIndex).trim();
+        List<String> parameters = parseParameters(paramString);
+
+        // El cuerpo de la función es el resto de la expresión después de los parámetros.
+        String bodyString = paramsAndBody.substring(endOfParamsIndex).trim();
+        Object body = parse(bodyString); // Reutiliza parse para el cuerpo, puede contener expresiones complejas.
+
+        List<Object> defunExpression = new ArrayList<>();
+        defunExpression.add("DEFUN");
+        defunExpression.add(functionName);
+        defunExpression.add(parameters);
+        defunExpression.add(body);
+
+        return defunExpression;
+    }
+    
+
+    /**
+     * Analiza la cadena de parámetros de una función, esperando que estén separados por espacios
+     * y encerrados entre paréntesis. Los parámetros son devueltos como una lista de cadenas.
+     * 
+     * @param paramString La cadena de texto que contiene los parámetros de la función, incluyendo los paréntesis.
+     * @return Una lista de cadenas, cada una representando un parámetro de la función.
+     * @throws Exception Si la cadena de parámetros está vacía o los parámetros no están en el formato esperado.
+     */
+    
+    private static List<String> parseParameters(String paramString) throws Exception {
+    // Asume que los parámetros están encerrados en paréntesis y separados por espacios.
+    // Elimina los paréntesis iniciales y finales.
+    String params = paramString.substring(1, paramString.length() - 1).trim();
+    if (params.isEmpty()) {
+        return new ArrayList<>();
+    }
+    // Divide los parámetros por espacios. Esto es simplista y podría necesitar ajuste para casos más complejos.
+    return Arrays.asList(params.split("\\s+"));
+}
 }
 
