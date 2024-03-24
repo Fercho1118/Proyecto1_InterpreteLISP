@@ -67,30 +67,14 @@ public class ExpressionEvaluator {
     
         // Preprocesa los argumentos para manejar strings como expresiones
         for (Object arg : originalArgs) {
-            if (arg instanceof String){
+            if (arg instanceof String) {
                 System.out.println("Evaluando un string ... !!!");
                 Object parsedExpr = Parser.parse((String) arg);
-                args.add(evaluate(parsedExpr));              
+                args.add(evaluate(parsedExpr));
             } else {
                 args.add(arg);
             }
         }
-
-        if ("DEFUN".equals(list.get(0))) {
-            String functionName = (String) list.get(1);
-            List<String> parameters = (List<String>) list.get(2);
-            Object body = list.get(3);
-            defunHandler.defineFunction(functionName, parameters, body);
-            return null; // O cualquier valor apropiado
-        }
-    
-        // Ejemplo de manejo de llamada a función
-        if (environment.lookupFunction(list.get(0).toString()) != null) {
-            String functionName = list.get(0).toString();
-            List<Object> arguments = new ArrayList<>(list.subList(1, list.size()));
-            return defunHandler.applyFunction(functionName, arguments);
-        }
-    
         // Dentro de la estructura switch en el método evaluateList
         switch (operator) {
             case "+":{
@@ -152,7 +136,7 @@ public class ExpressionEvaluator {
                 Object firstArg = evaluate(args.get(0));
                 Object secondArg = evaluate(args.get(1));
                 return firstArg.equals(secondArg);
-            }
+            }            
         }
     
         LispFunction userFunction = environment.lookupFunction(operator);
@@ -168,17 +152,40 @@ public class ExpressionEvaluator {
             if (originalArgs.size() != 2) {
                 throw new Exception("SETQ espera exactamente dos argumentos.");
             }
-            
+
             if (!(originalArgs.get(0) instanceof String)) {
-                throw new Exception("El primer argumento de SETQ debe ser una cadena que represente el nombre de la variable.");
+                throw new Exception(
+                        "El primer argumento de SETQ debe ser una cadena que represente el nombre de la variable.");
             }
             String variableName = (String) originalArgs.get(0);
-            
+
             Object value = evaluate(originalArgs.get(1));
-            
+
             environment.defineVariable(variableName, value);
-        
+
             return value;
+        }
+        
+        if ("DEFUN".equals(operator)) {
+            String functionName = (String) list.get(1);
+    
+            if (!(list.get(2) instanceof List)) {
+                throw new Exception("El segundo argumento de DEFUN debe ser una lista de parámetros.");
+            }
+            List<?> rawParameters = (List<?>) list.get(2);
+            List<String> parameters = new ArrayList<>();
+            for (Object param : rawParameters) {
+                if (!(param instanceof String)) {
+                    throw new Exception("Todos los parámetros deben ser cadenas.");
+                }
+                parameters.add((String) param);
+            }
+    
+            Object body = list.get(3);
+            defunHandler.defineFunction(functionName, parameters, body);
+    
+            // Retorna un mensaje de confirmación o null, según prefieras.
+            return "Función " + functionName + " definida correctamente.";
         }
     
         throw new Exception("Operador o función desconocido/a: " + operator);

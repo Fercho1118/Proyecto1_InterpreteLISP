@@ -18,6 +18,7 @@
 
 ; Definición de una función que suma dos números
 (DEFUN sumar (a b) (+ a b))
+(DEFUN sumar (a b) (+ a b))
 
 ; Uso de una función definida por el usuario
 (sumar 3 7)
