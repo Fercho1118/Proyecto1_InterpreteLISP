@@ -1,3 +1,9 @@
+/**
+ * Nicolas Concuá - 23197
+ * Fernando Hernández - 23645
+ * Fernando Rueda - 23748
+ */
+
 package uvg.edu.gt;
 import java.util.List;
 
